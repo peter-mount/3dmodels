@@ -81,6 +81,7 @@ module MicroUSB() {
 
 /*
  * A 1 port USB connector as present on the Raspberry PI Model A+
+ */
 module USB1() {
 	difference() {
 		cube([13.5,13.5,9], center=true);
