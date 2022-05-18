@@ -26,7 +26,9 @@ pcb_lug_ro = pcb_lug_rr;
 //
 // payload_height height of payload, minimum is 51.5 but can be higher
 //
-module BBCCartridge(component = 3, backStyle = 1, topLabelInset = 0, payload_height = 51.5) {
+// pcbBump 1 to include bump in pcb support as some pcb's have a space for it, 0 for none
+//
+module BBCCartridge(component = 3, backStyle = 1, topLabelInset = 0, payload_height = 51.5, pcbBump = 1) {
 
     fullBackConnector = backStyle == 0 ? 0 : 1;
     realisticPolarisationKey = backStyle == 1 ? 1 : 0;
@@ -165,8 +167,8 @@ module BBCCartridge(component = 3, backStyle = 1, topLabelInset = 0, payload_hei
 
     pcb_back_support_bump_width = pcb_front_support_width;
     pcb_back_support_bump_depth = 1.5;
-    pcb_back_support_left_bump_height = 13.2;
-    pcb_back_support_right_bump_height = 10.7;
+    pcb_back_support_left_bump_height = pcbBump == 1 ? 13.2 : 0.0;
+    pcb_back_support_right_bump_height = pcbBump == 1 ? 10.7 : 0.0;
     pcb_back_support_left_bump_offset_from_bottom = 15.1;
     pcb_back_support_right_bump_offset_from_bottom = 17.6;
     pcb_back_support_break_from_bottom = 35.3;    /* 36.45 from the above diagram */
@@ -243,26 +245,17 @@ module BBCCartridge(component = 3, backStyle = 1, topLabelInset = 0, payload_hei
                 union() {
                     // Underlying support strut
                     difference() {
-                        cube([pcb_back_support_width,
-                            pcb_back_support_depth,
-                            pcb_back_support_height], center = true);
-                        cube_at(pcb_back_support_width,
-                        pcb_back_support_depth,
-                        break_height,
-                        0, 1, 1,
-                        0,
-                            - pcb_back_support_depth / 2,
-                                - pcb_back_support_height / 2 + break_offset);
+                        cube([pcb_back_support_width, pcb_back_support_depth, pcb_back_support_height], center = true);
+
+                        cube_at(pcb_back_support_width, pcb_back_support_depth, break_height, 0, 1, 1, 0, -
+                        pcb_back_support_depth / 2, - pcb_back_support_height / 2 + break_offset);
                     }
 
                     // Middle bump
-                    cube_at(pcb_back_support_bump_width,
-                    pcb_back_support_bump_depth,
-                    bump_height,
-                    0, - 1, 1,
-                    0,
-                        - pcb_back_support_depth / 2,
-                            - pcb_back_support_height / 2 + bump_offset);
+                    if (bump_height > 0) {
+                        cube_at(pcb_back_support_bump_width, pcb_back_support_bump_depth, bump_height, 0, - 1, 1, 0, -
+                        pcb_back_support_depth / 2, - pcb_back_support_height / 2 + bump_offset);
+                    }
                 }
             }
         }
@@ -387,22 +380,10 @@ module BBCCartridge(component = 3, backStyle = 1, topLabelInset = 0, payload_hei
     }
 
     /* The holes in the back surface when socket lugs are used. */
-
     module pcb_back_socket_hole(xdir) {
         pcb_socket_hole_explicit(xdir, int_connector_width / 2 - pcb_lug_offset_from_inside,
             back_depth + extra,
         pcb_lug_offset_from_bottom,
-            payload_back + extra * 2, pcb_front_lug_inner_radius);
-    }
-
-    module pcb_back_socket_hole_wide(xdir) {
-        pcb_socket_hole_explicit(xdir, int_payload_width / 2 - wide_pcb_lug_offset_from_inside,
-            back_depth + extra,
-        wide_pcb_lug_offset_from_bottom,
-            payload_back + extra * 2, pcb_front_lug_inner_radius);
-        pcb_socket_hole_explicit(xdir, int_payload_width / 2 - wide_pcb_lug_offset_from_inside,
-            back_depth + extra,
-                wide_pcb_height - edge_connector_height - wide_pcb_lug_offset_from_bottom,
             payload_back + extra * 2, pcb_front_lug_inner_radius);
     }
 
@@ -417,8 +398,8 @@ module BBCCartridge(component = 3, backStyle = 1, topLabelInset = 0, payload_hei
                 cylinder(h = hole_depth, r = hole_radius);
     }
 
-    // Front half
     if (component == 0) {
+        // Front half
         difference() {
             union() {
 
@@ -547,10 +528,8 @@ module BBCCartridge(component = 3, backStyle = 1, topLabelInset = 0, payload_hei
                         fillet_partitioned(rr, connector_height - bottom);
             }
         }
-    }
-
-    // Back half
-    if (component == 1) {
+    } else {
+        // Back half
         difference() {
             union() {
                 cube_at(payload_width, payload_back, payload_height, 0, 1, 1, payload_centre, int_payload_back_depth,
@@ -653,6 +632,7 @@ module BBCCartridge(component = 3, backStyle = 1, topLabelInset = 0, payload_hei
                     pcb_back_support_left_bump_offset_from_bottom,
                     pcb_back_support_break_from_bottom,
                     pcb_back_support_break_height);
+
                     pcb_support(1, pcb_back_support_right_bump_height,
                     pcb_back_support_right_bump_offset_from_bottom,
                     pcb_back_support_break_from_bottom,
@@ -841,7 +821,3 @@ module BBCCartridge(component = 3, backStyle = 1, topLabelInset = 0, payload_hei
         }
     }
 }
-
-BBCCartridge(component = 0);
-translate([100, 0, 0]) BBCCartridge(component = 1);
-
