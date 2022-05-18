@@ -163,7 +163,7 @@ pcb_support_offset_from_centre = edge_connector_cutout_back_width / 2 - pcb_supp
 pcb_lug_mating_depth = pcb_back_support_bump_depth + 1.0;
 
 pcb_back_lug_depth = pcb_back_support_depth + pcb_lug_mating_depth;
-pcb_back_lug_inner_radius = 1.0;
+pcb_back_lug_inner_radius = 1.5;
 pcb_back_lug_outer_radius = 5.5 / 2;
 
 pcb_lug_cross_width = 6.7;
@@ -250,10 +250,13 @@ module pcb_back_plug(x, y) {
 
                 union() {
                     cylinder(h = pcb_back_lug_depth, r = pcb_back_lug_outer_radius);
+                    cylinder(h = 3, r = pcb_back_lug_outer_radius + 1);
+
                     cube_at(pcb_lug_cross_width,
                     pcb_lug_cross_height, pcb_lug_cross_depth,
                     0, 0, 1,
                     0, 0, 0);
+
                     cube_at(pcb_lug_cross_height,
                     pcb_lug_cross_width, pcb_lug_cross_depth,
                     0, 0, 1,
@@ -270,10 +273,12 @@ module pcb_back_plug(x, y) {
             }
 }
 
-module pcb_back_hole(x, y,hole_depth) {
-    translate([x, back_depth+extra, y])
+module pcb_back_hole(x, y, hole_depth) {
+    translate([x, back_depth + extra + 2, y])
         rotate([90, 0, 0])
-            cylinder(h=hole_depth, r=pcb_back_lug_outer_radius);
+            union() {
+                cylinder(h = hole_depth + 2, r = pcb_back_lug_outer_radius);
+            }
 }
 
 module pcb_front_plug(x, depth_offset, y, lug_depth, lug_outer_radius, lug_inner_radius) {
@@ -440,8 +445,15 @@ module BBCCartridge(component = 3, backStyle = 1, topLabelInset = 0) {
         // Back half
         difference() {
             union() {
+                difference() {
                 cube_at(payload_width, payload_back, payload_height, 0, 1, 1, payload_centre, int_payload_back_depth,
                 int_payload_lower_extent);
+
+                // Thin back to allow for roms in sockets
+                    translate([3-pcb_support_offset_from_centre, 10.25,7-(pcb_back_support_height / 2)])//- pcb_back_support_height / 2])
+                        cube([pcb_support_offset_from_centre*2-6, 1,pcb_back_support_height-3]);
+
+                }
 
                 cube_at(back_left, back_depth, payload_height, - 1, 1, 1, int_payload_left_extent, 0,
                 int_payload_lower_extent);
