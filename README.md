@@ -1,21 +1,24 @@
 This repository contains a collection of 3D models written with OpenSCAD.
 These are small one off models which would otherwise require a separate repository per
 
-# bbc
+# retro
 
-3D models for the Acorn BBC Micro (Model B or Master 128).
+3D models for retro computers
+* retro/bbc models for the Acorn BBC Micro (Model B or Master 128).
 Some will also work for the Acorn Electron.
+  * retro/bbc/cartridges ROM cartridge cases for the BBC Master 128 or Electron Plus 1
 
 # raspberryPi
 
 A collection of models for the Raspberry pi
-cameramount
 
+* raspberryPi/cameramount
 A library that can be used to generate an enclosure for the PI camera module embedded within 
 A basic PI Camera housing which can be customised/embeded within other models.
+* raspberryPi/eyepiece a mount for the original (not HQ) camera to attach it to a telescope
+* raspberryPi/polar-wedge a simple polar wedge for a common servo based mount for the original camera.
 
-License
-=======
+# License
 
 Copyright 2016-2022 Peter T Mount.
 
