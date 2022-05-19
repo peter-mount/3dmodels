@@ -1,8 +1,10 @@
-Raspberry PI Camera 3D Models
-=============================
-
 This repository contains a collection of 3D models written with OpenSCAD.
 These are small one off models which would otherwise require a separate repository per
+
+# bbc
+
+3D models for the Acorn BBC Micro (Model B or Master 128).
+Some will also work for the Acorn Electron.
 
 # raspberryPi
 
